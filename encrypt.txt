@@ -14,16 +14,16 @@ PART 1:-
 	   Therefore, Both Bob & Alice have a copy of the public key & they should not share the private key.
 
 2. Command to generate CSR file on the Host machine.
-	openssl req -new -newkey rsa:2048 -nodes -keyout server.key -out ngg1756.csr
+	openssl req -new -newkey rsa:2048 -nodes -keyout server.key -out sxp3156.csr
    		Country = US
 		State = Texas
 		Locality = Arlington
 		Org Name = UTA
 		Org Unit = iSec
-		Common Name = ngg1756
+		Common Name = sxp3156
 
-3. Send ngg1756.csr to GTA.
-   GTA sends back the certificate file ngg1756.crt
+3. Send sxp3156.csr to GTA.
+   GTA sends back the certificate file sxp3156.crt
 
 4. Command to generate pubkey.pem
 	openssl x509 -pubkey -noout -in TA_Cert.pem > pubkey.pem
