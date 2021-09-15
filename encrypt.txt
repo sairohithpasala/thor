@@ -1,0 +1,98 @@
+Sai Rohith Pasala
+1001873156
+
+Team Members:-
+Sree Harsha Kandepaneni (1001717230)
+
+
+PART 1:-
+1.	a. By using public-private keypair for encryption and decryption, Bob & Alice can be confident that the data is what the they meant it to say.
+	   The recipient is assured of the confidentiality, integrity, and authenticity of the data.
+	b. The public key is used to encrpyt & a private key is used to decrypt data.
+	   If Bob wants to send Alice a message, he can take Alice's public key & encrypt the message using the public key.
+	   Only Alice can decrypt the encrypted message from Bob as only she has the private key for the encrypted message.
+	   Therefore, Both Bob & Alice have a copy of the public key & they should not share the private key.
+
+2. Command to generate CSR file on the Host machine.
+	openssl req -new -newkey rsa:2048 -nodes -keyout server.key -out ngg1756.csr
+   		Country = US
+		State = Texas
+		Locality = Arlington
+		Org Name = UTA
+		Org Unit = iSec
+		Common Name = ngg1756
+
+3. Send ngg1756.csr to GTA.
+   GTA sends back the certificate file ngg1756.crt
+
+4. Command to generate pubkey.pem
+	openssl x509 -pubkey -noout -in TA_Cert.pem > pubkey.pem
+   Compare pubkey.pem with TA_Key1.pub,TA_Key2.pub & TA_Key3.pub
+	diff pubkey.pem TA_Key1.pub
+	diff pubkey.pem TA_Key2.pub
+	diff pubkey.pem TA_Key3.pub
+   TA_Key3.pub is the correct public key.
+
+PART 2:-
+5. Alice certificate sent to Bob.
+
+6. Copy Alice certificate from Download folder to lab1 folder.
+	scp Download/alice.crt lab1
+
+7. Command to Verify CA's signature on Alice certiificate.
+	openssl verify -CAfile TA_Cert.pem alice.crt
+   	- alice.crt: OK
+
+8. Command to extract Alice's public key from her certificate.
+	openssl x509 -pubkey -noout -in alice.crt  > alice.pub 
+
+9. Create a symmetric key & save it as symkey.bin
+	openssl rand 128 > symkey.bin
+
+10. Encrypt symkey.bin & saving it as symkey.bin.enc
+	openssl rsautl -encrypt -inkey alice.pub -pubin -in symkey.bin -out symkey.bin.enc
+
+11. Send symkey.bin.enc to Alice.
+
+12. Copy symkey.bin.enc from Download folder to lab1 folder.
+	scp Download/symkey.bin.enc lab1
+
+13. Decrypt symkey.bin.enc using Alice private key & Save file as symkey.bin
+	openssl rsautl -decrypt -inkey alice.key -in symkey.bin.enc -out symkey.bin 
+
+14. 	a. Bob should use AES(Advanced Encryption Standard) as it replaces DES & Triple-DES.
+	   AES also strengthens the security as well as boost its efficiency.
+    	b. AES provides Key Expansion and AddRoundKey, SubBytes, ShiftRows & MixColumns.
+	   There is never a 100% assurance but AES is secure & efficient enough.
+
+15. Encrypt secret.txt & Save it as secret.txt.enc
+	openssl enc -e -aes128 -in secret.txt -out secret.txt.enc -k symkey.bin
+
+16. Send secret.txt.enc to Alice.
+
+17. Copy secret.txt.enc from Download folder to lab1 folder.
+	scp Download/secret.txt.enc lab1
+
+18. Decrypt Bob's encrypted message & save as secret.txt
+	openssl enc -d -aes128 -in secret.txt.enc -out secret.txt -k symkey.bin
+
+19. Create a SHA-512 digest of message.txt using alice.key & saving it as message.txt.sha512
+	openssl dgst -sha512 -sign alice.key -out message.txt.sha512 message.txt
+
+20. Send message.txt & message.txt.sha512 to Bob.
+
+21. Copy message.txt & message.txt.sha512 from Download folder to lab1 folder.
+	scp -r Download lab1
+		OR
+	scp Download/message.txt lab1
+	scp Download/message.txt.sha512 lab1
+
+22. Verify Alice's signed message with alice.pub
+	openssl dgst -sha512 -verify alice.pub -signature message.txt.sha512 message.txt
+	Verified OK
+
+23. If Alice used her public key to sign the message then anyone with Alice's public key can pretend to be Alice & forge her signatures.
+
+24. Delete files from Alice's & Bob's machine.
+	rm alice.pub symkey.bin symkey.bin.enc secret.txt secret.txt.enc message.txt message.txt.sha512
+
